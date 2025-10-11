@@ -49,6 +49,6 @@ func ContentSlide(t *Theme, title, content string) Slide {
 
 		t.Background(screen)
 		text.AutoBox(screen, t.TextStyles[2].Apply(title), geom.Pt(d.X/16, 3*d.Y/16), geom.Dim(0, 1))
-		text.AutoBox(screen, t.TextStyles[3].Apply(content), geom.Pt(d.X/16, 5*d.Y/16), geom.Dim(0, 0))
+		text.AutoBox(screen, t.TextStyles[3].Apply(content), geom.Pt(d.X/16, 4*d.Y/16), geom.Dim(0, 0))
 	})
 }

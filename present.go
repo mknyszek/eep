@@ -21,8 +21,8 @@ func NewDeck(width, height int) *Deck {
 	return &Deck{width: width, height: height}
 }
 
-func (d *Deck) Append(s Slide) {
-	d.slides = append(d.slides, s)
+func (d *Deck) Append(s ...Slide) {
+	d.slides = append(d.slides, s...)
 }
 
 func (d *Deck) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

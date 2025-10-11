@@ -37,6 +37,13 @@ func (s Style) Apply(text string) String {
 	return b.String()
 }
 
+// Recolor returns a new style that's the same as this one but with a different color.
+func (s Style) Recolor(c color.Color) Style {
+	newStyle := s
+	newStyle.Color = c
+	return newStyle
+}
+
 // String is a string of styled text.
 //
 // All of the styles must have font face with an identical Direction.

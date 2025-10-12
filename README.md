@@ -91,3 +91,5 @@ This is for fun.
 - Presentation timer (in separate window).
 - Edit mode for WYSIWYG editing, which is serialized back into an overlay
   file that's loaded on startup.
+- Math TeX expression support, via codeberg.org/go-latex/latex.
+  (Most of the work is hooking up Ebiten fonts to what latex expects.)

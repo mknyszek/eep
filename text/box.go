@@ -27,8 +27,6 @@ func AutoBox(dst *ebiten.Image, txt String, pos geom.Point, anchor geom.Dimensio
 }
 
 func drawString(dst *ebiten.Image, txt String, orig geom.Point, txtDim geom.Dimensions, boxOpts *BoxOptions) {
-	var opts text.DrawOptions
-
 	// Advance our way through the positions and draw.
 	m := newBoxDrawMachine(orig, geom.ImageAABB(dst.Bounds()).Dim(), txtDim, txt.direction, boxOpts.Align, boxOpts.VertAlign)
 	for segments := range txt.lines() {
@@ -43,11 +41,10 @@ func drawString(dst *ebiten.Image, txt String, orig geom.Point, txtDim geom.Dime
 			}
 			face := seg.style.Face.TextFace()
 
+			var opts text.DrawOptions
 			opts.GeoM.Translate(m.X(), m.Y())
 			opts.ColorScale.ScaleWithColor(seg.style.Color)
 			text.Draw(dst, seg.text, seg.style.Face.TextFace(), &opts)
-			opts.GeoM.Reset()
-			opts.ColorScale.Reset()
 
 			m.MoveInLine(text.Advance(seg.text, face))
 		}

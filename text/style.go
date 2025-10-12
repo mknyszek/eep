@@ -30,11 +30,9 @@ func Basic(fontName string, size float64, c color.Color) Style {
 	}
 }
 
-// Apply applies the style to some text to produce a Segment of styled text.
-func (s Style) Apply(text string) String {
-	var b StringBuilder
-	b.Append(text, s)
-	return b.String()
+// Apply applies the style to some text to produce a Piece of styled text.
+func (s Style) Apply(text string) Piece {
+	return Piece{text, s}
 }
 
 // Recolor returns a new style that's the same as this one but with a different color.
@@ -67,6 +65,8 @@ func (s String) Concat(t String) String {
 }
 
 // segment is a text segment with no line breaks and a single consistent style.
+//
+// Distinct from Piece because Piece doesn't enforce the "no line breaks" rule.
 type segment struct {
 	text  string
 	style Style
@@ -124,6 +124,28 @@ func (s String) lines() iter.Seq[[]segment] {
 	}
 }
 
+// Piece represents a piece of text with a consistent style.
+type Piece struct {
+	Text  string
+	Style Style
+}
+
+// String creates a new String containing only the piece.
+func (p Piece) String() String {
+	var b StringBuilder
+	b.Append(p)
+	return b.String()
+}
+
+// Concat concatenates a series of Pieces to form a String.
+func Concat(pieces ...Piece) String {
+	var b StringBuilder
+	for _, p := range pieces {
+		b.Append(p)
+	}
+	return b.String()
+}
+
 // StringBuilder is a builder for efficiently constructing
 // styled strings. The zero value is ready for use.
 type StringBuilder struct {
@@ -131,16 +153,16 @@ type StringBuilder struct {
 	nonZero bool
 }
 
-// Append appends the provided text and applies the given style to it.
-func (s *StringBuilder) Append(text string, style Style) {
+// Append appends the provided piece.
+func (s *StringBuilder) Append(piece Piece) {
 	if !s.nonZero {
-		s.s.direction = style.Face.TextFace().Direction
+		s.s.direction = piece.Style.Face.TextFace().Direction
 		s.nonZero = true
 	}
-	if s.s.direction != style.Face.TextFace().Direction {
+	if s.s.direction != piece.Style.Face.TextFace().Direction {
 		panic("cannot append different text direction to builder")
 	}
-	s.s.segments = appendSegmentsFromText(s.s.segments, text, style)
+	s.s.segments = appendSegmentsFromText(s.s.segments, piece.Text, piece.Style)
 }
 
 // String returns the builder's accumulated String.

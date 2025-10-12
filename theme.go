@@ -38,17 +38,39 @@ func TitleSlide(t *Theme, title, subtitle string) Slide {
 		d := geom.ImageDim(screen.Bounds())
 
 		t.Background(screen)
-		text.AutoBox(screen, t.TextStyles[0].Apply(title), geom.Pt(d.X/8, 3*d.Y/5), geom.Dim(0, 1))
-		text.AutoBox(screen, t.TextStyles[1].Apply(subtitle), geom.Pt(d.X/8, 3*d.Y/5), geom.Dim(0, 0))
+		text.AutoBox(screen, t.TextStyles[0].Apply(title).String(), geom.Pt(d.X/8, 3*d.Y/5), geom.Dim(0, 1))
+		text.AutoBox(screen, t.TextStyles[1].Apply(subtitle).String(), geom.Pt(d.X/8, 3*d.Y/5), geom.Dim(0, 0))
 	})
 }
 
-func ContentSlide(t *Theme, title, content string) Slide {
+func BlankContentSlide(t *Theme, title string) Slide {
 	return Static(func(screen *ebiten.Image) {
 		d := geom.ImageDim(screen.Bounds())
 
 		t.Background(screen)
-		text.AutoBox(screen, t.TextStyles[2].Apply(title), geom.Pt(d.X/16, 3*d.Y/16), geom.Dim(0, 1))
-		text.AutoBox(screen, t.TextStyles[3].Apply(content), geom.Pt(d.X/16, 4*d.Y/16), geom.Dim(0, 0))
+		text.AutoBox(screen, t.TextStyles[2].Apply(title).String(), geom.Pt(d.X/16, 3*d.Y/16), geom.Dim(0, 1))
+	})
+}
+
+func ContentSlide(t *Theme, title string, makeContent func(text.Style) text.String) Slide {
+	content := makeContent(t.TextStyles[3])
+	return Overlay(
+		BlankContentSlide(t, title),
+		Static(func(screen *ebiten.Image) {
+			d := geom.ImageDim(screen.Bounds())
+			text.AutoBox(screen, content, geom.Pt(d.X/16, 4*d.Y/16), geom.Dim(0, 0))
+		}),
+	)
+}
+
+func BasicContentSlide(t *Theme, title, content string) Slide {
+	return ContentSlide(t, title, func(style text.Style) text.String {
+		return style.Apply(content).String()
+	})
+}
+
+func BlankSlide(t *Theme) Slide {
+	return Static(func(screen *ebiten.Image) {
+		t.Background(screen)
 	})
 }

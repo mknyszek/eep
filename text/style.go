@@ -37,9 +37,14 @@ func (s Style) Apply(text string) Piece {
 
 // Recolor returns a new style that's the same as this one but with a different color.
 func (s Style) Recolor(c color.Color) Style {
-	newStyle := s
-	newStyle.Color = c
-	return newStyle
+	s.Color = c
+	return s
+}
+
+// Resize returns a new style that's the same as this one but with a different font size.
+func (s Style) Resize(size float64) Style {
+	s.Face = s.Face.Resize(size)
+	return s
 }
 
 // String is a string of styled text.

@@ -64,6 +64,15 @@ func (f *Face) Size() float64 {
 	return f.face.Size
 }
 
+// Resize returns a new Face with all the same features except with the
+// font size changed to the provided size.
+func (f *Face) Resize(size float64) *Face {
+	g := new(Face)
+	*g = *f
+	g.face.Size = size
+	return g
+}
+
 // LineSize is the amount of vertical or horizontal space (depending on
 // the face's Direction) takes up on a line. lineSpacing is the relative
 // amount of additional spacing to provide the line. For example, 0.0 is

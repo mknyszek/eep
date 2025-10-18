@@ -51,6 +51,19 @@ func (c *Context) Rect(m Method, bounds geom.AABB) {
 	})
 }
 
+// XMark draws an X mark within the provided bounds.
+// The draw method is always Stroke.
+// It uses the current context, but does not modify the current path.
+func (c *Context) XMark(bounds geom.AABB) {
+	c.WithEmpty(func(c *Context) {
+		c.MoveTo(bounds.Min)
+		c.LineTo(bounds.Max)
+		c.MoveTo(geom.Pt(bounds.Min.X, bounds.Max.Y))
+		c.LineTo(geom.Pt(bounds.Max.X, bounds.Min.Y))
+		c.Draw(Stroke, true) // No need to clear the path.
+	})
+}
+
 // Arrow draws an arrow from src to dst.
 func (c *Context) Arrow(src, dst geom.Point) {
 	c.WithEmpty(func(c *Context) {

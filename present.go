@@ -122,3 +122,48 @@ func (d *StaticDeck) Update() error {
 func (d *StaticDeck) Draw(screen *ebiten.Image) {
 	d.slides[d.currSlide].Draw(screen)
 }
+
+// ChainDeck chains together one or more slide decks.
+type ChainDeck struct {
+	decks    []SlideDeck
+	currDeck int
+}
+
+// Append adds a Slide to the deck.
+func (d *ChainDeck) Append(s ...SlideDeck) {
+	d.decks = append(d.decks, s...)
+}
+
+// Next advances the slide deck forward.
+func (d *ChainDeck) Next() DeckStatus {
+	if status := d.decks[d.currDeck].Next(); status != DeckEnd {
+		return status
+	}
+	if d.currDeck < len(d.decks)-1 {
+		d.currDeck++
+		return DeckOK
+	}
+	return DeckEnd
+}
+
+// Prev advances the slide deck backward.
+func (d *ChainDeck) Prev() DeckStatus {
+	if status := d.decks[d.currDeck].Prev(); status != DeckEnd {
+		return status
+	}
+	if d.currDeck > 0 {
+		d.currDeck--
+		return DeckOK
+	}
+	return DeckEnd
+}
+
+// Update implements Slide by updating the current Slide.
+func (d *ChainDeck) Update() error {
+	return d.decks[d.currDeck].Update()
+}
+
+// Draw implements Slide by drawing the current Slide.
+func (d *ChainDeck) Draw(screen *ebiten.Image) {
+	d.decks[d.currDeck].Draw(screen)
+}

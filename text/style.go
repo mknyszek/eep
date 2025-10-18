@@ -46,21 +46,27 @@ func (s Style) Recolor(c color.Color) Style {
 //
 // All of the styles must have font face with an identical Direction.
 type String struct {
-	segments  []segment
-	direction font.TextDirection
+	segments []segment
+}
+
+// direction returns the canonical direction of the String.
+func (s String) direction() font.TextDirection {
+	if len(s.segments) == 0 {
+		return 0
+	}
+	return s.segments[0].style.Face.TextFace().Direction
 }
 
 // Concat concatenates the two styled Strings and returns the result.
 func (s String) Concat(t String) String {
-	if s.direction != t.direction {
+	if s.direction() != t.direction() {
 		panic("cannot concatenate two styled strings with different text direction")
 	}
 	segments := make([]segment, 0, len(s.segments)+len(t.segments))
 	segments = append(segments, s.segments...)
 	segments = append(segments, t.segments...)
 	return String{
-		direction: s.direction,
-		segments:  segments,
+		segments: segments,
 	}
 }
 
@@ -77,30 +83,28 @@ func (s String) Measure(lineSpacing float64) geom.Dimensions {
 	var primary, secondary float64 // Totals.
 	for segments := range s.lines() {
 		// Figure out the increments for each line.
-		incPri, incSec := measureLine(segments, s.direction, lineSpacing)
+		incPri, incSec := measureLine(segments, lineSpacing)
 
 		// Accumulate.
 		primary = max(primary, incPri)
 		secondary += incSec
 	}
-	if s.direction == font.DirectionLeftToRight || s.direction == font.DirectionRightToLeft {
+	if dir := s.direction(); dir == font.DirectionLeftToRight || dir == font.DirectionRightToLeft {
 		return geom.Dim(primary, secondary)
 	}
 	return geom.Dim(secondary, primary)
 }
 
-func measureLine(segments []segment, direction font.TextDirection, lineSpacing float64) (priLen, secLen float64) {
+// measureLine measures the primary and secondary dimensions of the segments, which
+// must represent a single line. All the segments must have the same direction.
+//
+// The segments must contain only a single newline: at the end.
+func measureLine(segments []segment, lineSpacing float64) (priLen, secLen float64) {
 	var primary, secondary float64
 	for _, seg := range segments {
-		face := seg.style.Face.TextFace()
-		m := face.Metrics()
-		if direction == text.DirectionLeftToRight || direction == text.DirectionRightToLeft {
-			secondary = max(secondary, (m.HAscent+m.HDescent)*(lineSpacing+1.0))
-		} else {
-			secondary = max(secondary, (m.VAscent+m.VDescent)*(lineSpacing+1.0))
-		}
+		secondary = max(secondary, seg.style.Face.LineSize(lineSpacing))
 		if seg.text != "\n" {
-			primary += text.Advance(seg.text, face)
+			primary += text.Advance(seg.text, seg.style.Face.TextFace())
 		}
 	}
 	return primary, secondary
@@ -149,30 +153,31 @@ func Concat(pieces ...Piece) String {
 // StringBuilder is a builder for efficiently constructing
 // styled strings. The zero value is ready for use.
 type StringBuilder struct {
-	s       String
-	nonZero bool
+	segments  []segment
+	direction font.TextDirection
+	nonZero   bool
 }
 
 // Append appends the provided piece.
 func (s *StringBuilder) Append(piece Piece) {
 	if !s.nonZero {
-		s.s.direction = piece.Style.Face.TextFace().Direction
+		s.direction = piece.Style.Face.TextFace().Direction
 		s.nonZero = true
 	}
-	if s.s.direction != piece.Style.Face.TextFace().Direction {
+	if s.direction != piece.Style.Face.TextFace().Direction {
 		panic("cannot append different text direction to builder")
 	}
-	s.s.segments = appendSegmentsFromText(s.s.segments, piece.Text, piece.Style)
+	s.segments = appendSegmentsFromText(s.segments, piece.Text, piece.Style)
 }
 
 // String returns the builder's accumulated String.
 func (s *StringBuilder) String() String {
-	return s.s
+	return String{s.segments}
 }
 
 // Reset resets the StringBuilder to be empty.
 func (s *StringBuilder) Reset() {
-	s.s = String{}
+	s.segments = nil
 	s.nonZero = false
 }
 

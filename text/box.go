@@ -28,10 +28,10 @@ func AutoBox(dst *ebiten.Image, txt String, pos geom.Point, anchor geom.Dimensio
 
 func drawString(dst *ebiten.Image, txt String, orig geom.Point, txtDim geom.Dimensions, boxOpts *BoxOptions) {
 	// Advance our way through the positions and draw.
-	m := newBoxDrawMachine(orig, geom.ImageAABB(dst.Bounds()).Dim(), txtDim, txt.direction, boxOpts.Align, boxOpts.VertAlign)
+	m := newBoxDrawMachine(orig, geom.ImageAABB(dst.Bounds()).Dim(), txtDim, txt.direction(), boxOpts.Align, boxOpts.VertAlign)
 	for segments := range txt.lines() {
 		// Figure out the increments for each line.
-		primary, secondary := measureLine(segments, txt.direction, boxOpts.LineSpacing)
+		primary, secondary := measureLine(segments, boxOpts.LineSpacing)
 
 		// Render the line.
 		m.StartLine(primary)

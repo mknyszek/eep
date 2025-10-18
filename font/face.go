@@ -64,6 +64,19 @@ func (f *Face) Size() float64 {
 	return f.face.Size
 }
 
+// LineSize is the amount of vertical or horizontal space (depending on
+// the face's Direction) takes up on a line. lineSpacing is the relative
+// amount of additional spacing to provide the line. For example, 0.0 is
+// single-spaced and 1.0 is double-spaced. Negative lineSpacing reduces
+// the line size.
+func (f *Face) LineSize(lineSpacing float64) float64 {
+	m := f.face.Metrics()
+	if f.face.Direction == text.DirectionLeftToRight || f.face.Direction == text.DirectionRightToLeft {
+		return (m.HAscent + m.HDescent) * (lineSpacing + 1.0)
+	}
+	return (m.VAscent + m.VDescent) * (lineSpacing + 1.0)
+}
+
 // TextFace returns the underlying Ebiten GoTextFace.
 //
 // Mutating the result will also mutate Face.

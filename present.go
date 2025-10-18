@@ -84,58 +84,26 @@ const (
 	DeckEnd
 )
 
-// StaticDeck is a SlideDeck that contains a static set of Slides.
-type StaticDeck struct {
-	currSlide int
-	slides    []Slide
-}
-
-// Append adds a Slide to the deck.
-func (d *StaticDeck) Append(s ...Slide) {
-	d.slides = append(d.slides, s...)
-}
-
-// Next advances the slide deck forward.
-func (d *StaticDeck) Next() DeckStatus {
-	if d.currSlide < len(d.slides)-1 {
-		d.currSlide++
-		return DeckOK
-	}
-	return DeckEnd
-}
-
-// Prev advances the slide deck backward.
-func (d *StaticDeck) Prev() DeckStatus {
-	if d.currSlide > 0 {
-		d.currSlide--
-		return DeckOK
-	}
-	return DeckEnd
-}
-
-// Update implements Slide by updating the current Slide.
-func (d *StaticDeck) Update() error {
-	return d.slides[d.currSlide].Update()
-}
-
-// Draw implements Slide by drawing the current Slide.
-func (d *StaticDeck) Draw(screen *ebiten.Image) {
-	d.slides[d.currSlide].Draw(screen)
-}
-
-// ChainDeck chains together one or more slide decks.
-type ChainDeck struct {
+// Deck is a basic implementation of a slide deck.
+//
+// It can display slides directly as well as nested slide decks.
+type Deck struct {
 	decks    []SlideDeck
 	currDeck int
 }
 
 // Append adds a Slide to the deck.
-func (d *ChainDeck) Append(s ...SlideDeck) {
+func (d *Deck) Append(s ...SlideDeck) {
 	d.decks = append(d.decks, s...)
 }
 
+// Append adds a Slide to the deck.
+func (d *Deck) AppendSlides(s ...Slide) {
+	d.decks = append(d.decks, &staticDeck{slides: s})
+}
+
 // Next advances the slide deck forward.
-func (d *ChainDeck) Next() DeckStatus {
+func (d *Deck) Next() DeckStatus {
 	if status := d.decks[d.currDeck].Next(); status != DeckEnd {
 		return status
 	}
@@ -147,7 +115,7 @@ func (d *ChainDeck) Next() DeckStatus {
 }
 
 // Prev advances the slide deck backward.
-func (d *ChainDeck) Prev() DeckStatus {
+func (d *Deck) Prev() DeckStatus {
 	if status := d.decks[d.currDeck].Prev(); status != DeckEnd {
 		return status
 	}
@@ -159,11 +127,45 @@ func (d *ChainDeck) Prev() DeckStatus {
 }
 
 // Update implements Slide by updating the current Slide.
-func (d *ChainDeck) Update() error {
+func (d *Deck) Update() error {
 	return d.decks[d.currDeck].Update()
 }
 
 // Draw implements Slide by drawing the current Slide.
-func (d *ChainDeck) Draw(screen *ebiten.Image) {
+func (d *Deck) Draw(screen *ebiten.Image) {
 	d.decks[d.currDeck].Draw(screen)
+}
+
+// staticDeck is a SlideDeck that contains a static set of Slides.
+type staticDeck struct {
+	currSlide int
+	slides    []Slide
+}
+
+// Next advances the slide deck forward.
+func (d *staticDeck) Next() DeckStatus {
+	if d.currSlide < len(d.slides)-1 {
+		d.currSlide++
+		return DeckOK
+	}
+	return DeckEnd
+}
+
+// Prev advances the slide deck backward.
+func (d *staticDeck) Prev() DeckStatus {
+	if d.currSlide > 0 {
+		d.currSlide--
+		return DeckOK
+	}
+	return DeckEnd
+}
+
+// Update implements Slide by updating the current Slide.
+func (d *staticDeck) Update() error {
+	return d.slides[d.currSlide].Update()
+}
+
+// Draw implements Slide by drawing the current Slide.
+func (d *staticDeck) Draw(screen *ebiten.Image) {
+	d.slides[d.currSlide].Draw(screen)
 }

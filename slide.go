@@ -47,7 +47,7 @@ type Slide interface {
 // Static returns a slide that only has a Draw command.
 //
 // Without an Update function, the Slide is not expected
-// to evolve over time. Hence 'Static.'
+// to evolve over time, hence the name.
 func Static(f func(screen *ebiten.Image)) Slide {
 	return staticSlide{f}
 }
@@ -62,6 +62,24 @@ func (s staticSlide) Draw(screen *ebiten.Image) {
 
 func (s staticSlide) Update() error {
 	return nil
+}
+
+// Dynamic returns a slide that has both a Draw and Update command.
+func Dynamic(draw func(screen *ebiten.Image), update func() error) Slide {
+	return dynamicSlide{draw, update}
+}
+
+type dynamicSlide struct {
+	draw   func(screen *ebiten.Image)
+	update func() error
+}
+
+func (s dynamicSlide) Draw(screen *ebiten.Image) {
+	s.draw(screen)
+}
+
+func (s dynamicSlide) Update() error {
+	return s.update()
 }
 
 // Overlay returns a slide that draws dst, then src0 on top

@@ -69,7 +69,7 @@ func (c *Context) Arrow(src, dst geom.Point) {
 	c.WithEmpty(func(c *Context) {
 		// Draw arrow line.
 		c.MoveTo(src)
-		c.LineTo(src)
+		c.LineTo(dst)
 		c.Stroke()
 
 		// Compute arrow head points.

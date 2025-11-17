@@ -212,7 +212,7 @@ func (a AABB) Translate(v Vector) AABB {
 
 // Intersects returns true if the two AABBs intersect.
 func (a AABB) Intersects(b AABB) bool {
-	return !((a.Max.X < b.Min.X || a.Min.X > b.Max.X) && (a.Max.Y < b.Min.Y || a.Min.Y > b.Max.Y))
+	return !(a.Max.X < b.Min.X || a.Min.X > b.Max.X || a.Max.Y < b.Min.Y || a.Min.Y > b.Max.Y)
 }
 
 // Rad converts degrees to radians.

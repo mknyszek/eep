@@ -18,7 +18,7 @@ type Theme struct {
 	// TextStyles is the set of text styles for the theme.
 	//
 	// By convention, the first text style is for the main
-	// title, the second is for subtitles, and the third
+	// title, the second is for subtitles, the third
 	// is for secondary titles, and the fourth is for text
 	// content.
 	TextStyles []text.Style
@@ -40,6 +40,16 @@ func TitleSlide(t *Theme, title, subtitle string) Slide {
 		t.Background(screen)
 		text.AutoBox(screen, t.TextStyles[0].Apply(title).String(), geom.Pt(d.X/8, 3*d.Y/5), geom.Dim(0, 1))
 		text.AutoBox(screen, t.TextStyles[1].Apply(subtitle).String(), geom.Pt(d.X/8, 3*d.Y/5), geom.Dim(0, 0))
+	})
+}
+
+func SectionSlide(t *Theme, title string) Slide {
+	return Static(func(screen *ebiten.Image) {
+		t.Background(screen)
+		text.Box(screen, t.TextStyles[2].Apply(title).String(), geom.ImageAABB(screen.Bounds()), &text.BoxOptions{
+			Align:     text.Center,
+			VertAlign: text.Middle,
+		})
 	})
 }
 

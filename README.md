@@ -78,9 +78,6 @@ This is for fun.
 
 ## TODO
 
-- Each line in a text box should be able to have its own alignment.
-- More convenience functions in `graphics`.
-- More convenience functions in `text`.
 - Bold and italicized fonts are a bit awkward because we don't
   manage font families.
   You have to explicitly request the corresponding font by knowing

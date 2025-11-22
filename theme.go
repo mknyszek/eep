@@ -4,8 +4,8 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/mknyszek/eep/geom"
-	"github.com/mknyszek/eep/text"
+	"github.com/mknyszek/2d/ebiten/text"
+	"github.com/mknyszek/2d/geom"
 )
 
 type Theme struct {

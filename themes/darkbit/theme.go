@@ -5,11 +5,11 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/mknyszek/2d/ebiten/font"
+	"github.com/mknyszek/2d/ebiten/graphics"
+	"github.com/mknyszek/2d/ebiten/text"
+	"github.com/mknyszek/2d/geom"
 	"github.com/mknyszek/eep"
-	"github.com/mknyszek/eep/font"
-	"github.com/mknyszek/eep/geom"
-	"github.com/mknyszek/eep/graphics"
-	"github.com/mknyszek/eep/text"
 )
 
 var Theme *eep.Theme
